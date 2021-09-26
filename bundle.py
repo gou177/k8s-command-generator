@@ -15,7 +15,7 @@ newlineRegex = re.compile(r"\n\n+")
 context: Dict[str, Union[str, List[str]]] = {
     "preflighterrors": "",
 }
-pipeline = ["netfilter", "cri", "kube-tools", "swap", "action", "join", "addons"]
+pipeline = ["netfilter", "cri", "kube-tools", "swap", "action", "cni", "join", "addons"]
 
 
 def clearStr(data: str) -> str:
@@ -78,11 +78,24 @@ def formatPart(part: str):
     contextValue = context.get(part, "")
 
     if isinstance(contextValue, str):
-        return "\n".join(parts.get(part, {}).get(contextValue, [])).format(**context)
+        template = "\n".join(parts.get(part, {}).get(contextValue, [])).format(
+            **context
+        )
+        if template:
+            template = (
+                f"echo \"{'='*35}\n      {part}: {contextValue}\n{'='*35}\n\"\n"
+                + template
+            )
+        return template
 
     data = ""
     for value in contextValue:
-        data += "\n".join(parts.get(part, {}).get(value, [])).format(**context)
+        template = "\n".join(parts.get(part, {}).get(value, []))
+
+        if template:
+            data += f"echo \"{'='*35}\n      {part}: {value}\n{'='*35}\n\"\n"
+
+        data += template.format(**context)
         data += "\n\n"
 
     return data
@@ -134,9 +147,11 @@ if context["action"] in ["init", "join"]:
         context["preflighterrors"] = "Swap"
 
 if context["action"] == "join":
-    join_cmd = input(f"[{term.yellow}?{term.normal}] Join command:\n{term.blue}>{term.normal} ")
+    join_cmd = input(
+        f"[{term.yellow}?{term.normal}] Join command:\n{term.blue}>{term.normal} "
+    )
 
-    while (i := input(f"{term.blue}>{term.normal} ")):
+    while i := input(f"{term.blue}>{term.normal} "):
         join_cmd += i + "\n"
 
     context["join_cmd"] = join_cmd
@@ -163,7 +178,7 @@ cmd = ""
 for action in pipeline:
     cmd += formatPart(action)
     cmd += "\n"
-    
+
 print("================================================")
 print("     command")
 print("================================================")

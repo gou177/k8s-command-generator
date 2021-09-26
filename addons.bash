@@ -91,7 +91,7 @@ export PATH=$PWD/bin:$PATH
 cd $STARTPWD
 
 # istio (need istioctl)
-istioctl install
+yes | istioctl install
 
 # rook
 git clone --single-branch --branch release-1.7 https://github.com/rook/rook.git
