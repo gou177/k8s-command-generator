@@ -27,7 +27,7 @@ data:
     address-pools:
     - name: default
       protocol: layer2
-      addresses: $ip
+      addresses: $ip-$ip
 END
 
 # minio operator
@@ -38,10 +38,9 @@ mv kubectl-minio /usr/local/bin/
 
 kubectl minio init
 
-# Metrics Server
+# metrics server
 
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
 
 # kubectl-convert
 wget https://dl.k8s.io/v1.22.0/bin/linux/amd64/kubectl-convert
@@ -105,3 +104,12 @@ helm upgrade -i flagger flagger/flagger \
 --set crd.create=false \
 --set meshProvider=istio \
 --set metricsServer=http://vmsingle-vmsingle.monitoring:8429
+
+# print master join command
+echo "Master join command"
+export K8S_CERT_KEYS=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
+kubeadm token create --certificate-key ${K8S_CERT_KEYS} --print-join-command
+
+# print join command
+echo "Join command"
+kubeadm token create --print-join-command

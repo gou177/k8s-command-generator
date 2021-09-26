@@ -1,3 +1,4 @@
+# netfilter: yes
 modprobe br_netfilter
 echo "net.bridge.bridge-nf-call-iptables = 1" >> /etc/sysctl.conf
 echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
