@@ -51,10 +51,13 @@ chmod +X ./kubectl-convert
 
 # victoriametrics
 apt install unzip -y
-mkdir victoriametrics && cd ~/victoriametrics
+mkdir victoriametrics 
+cd ~/victoriametrics
 export VM_VERSION=`basename $(curl -fs -o/dev/null -w %{redirect_url} https://github.com/VictoriaMetrics/operator/releases/latest)`
 wget https://github.com/VictoriaMetrics/operator/releases/download/$VM_VERSION/bundle_crd.zip
 unzip  bundle_crd.zip 
+kubectl apply -f release/crds
+kubectl apply -f release/operator/
 cd $OLDPWD
 
 # clickhouse operator
@@ -87,3 +90,18 @@ echo -n "${PWD}" >> ~/.bashrc
 echo '/bin"' >> ~/.bashrc
 export PATH=$PWD/bin:$PATH
 cd $STARTPWD
+
+# rook
+git clone --single-branch --branch release-1.7 https://github.com/rook/rook.git
+cd rook/cluster/examples/kubernetes/ceph
+kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+cd $OLDPWD
+
+# flagger
+helm repo add flagger https://flagger.app
+kubectl apply -f https://raw.githubusercontent.com/fluxcd/flagger/main/artifacts/flagger/crd.yaml
+helm upgrade -i flagger flagger/flagger \
+--namespace=istio-system \
+--set crd.create=false \
+--set meshProvider=istio \
+--set metricsServer=http://vmsingle-vmsingle.monitoring:8429
