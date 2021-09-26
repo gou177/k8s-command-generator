@@ -10,7 +10,7 @@ term = Terminal()
 parts: Dict[str, Dict[str, List[str]]] = {}
 spaceRegex = re.compile(r" +")
 stringFormatEscapeRegex = re.compile(r"([\$%])\{([\w\d_-]+)\}")
-newlineRegex = re.compile(r"\n+")
+newlineRegex = re.compile(r"\n\n+")
 
 context: Dict[str, Union[str, List[str]]] = {
     "preflighterrors": "",
@@ -83,6 +83,7 @@ def formatPart(part: str):
     data = ""
     for value in contextValue:
         data += "\n".join(parts.get(part, {}).get(value, [])).format(**context)
+        data += "\n\n"
 
     return data
 
@@ -162,7 +163,11 @@ cmd = ""
 for action in pipeline:
     cmd += formatPart(action)
     cmd += "\n"
-
+    
+print("================================================")
+print("     command")
+print("================================================")
+print()
 print("bash << EOK8S")
-print(newlineRegex.sub("\n", cmd))
+print(newlineRegex.sub("\n\n", cmd).replace("$", "\\$"))
 print("EOK8S")

@@ -90,7 +90,7 @@ echo '/bin"' >> ~/.bashrc
 export PATH=$PWD/bin:$PATH
 cd $STARTPWD
 
-# istioctl install
+# istio (need istioctl)
 istioctl install
 
 # rook
