@@ -90,6 +90,9 @@ echo '/bin"' >> ~/.bashrc
 export PATH=$PWD/bin:$PATH
 cd $STARTPWD
 
+# istioctl install
+istioctl install
+
 # rook
 git clone --single-branch --branch release-1.7 https://github.com/rook/rook.git
 cd rook/cluster/examples/kubernetes/ceph
@@ -113,3 +116,6 @@ kubeadm token create --certificate-key ${K8S_CERT_KEYS} --print-join-command
 # print join command
 echo "Join command"
 kubeadm token create --print-join-command
+
+# print kubeconfig
+cat ~/.kube/config
