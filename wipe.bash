@@ -1,3 +1,4 @@
+# action: wipe
 systemctl stop kubelet
 systemctl stop docker
 systemctl stop containerd

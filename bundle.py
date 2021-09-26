@@ -94,7 +94,7 @@ prompt(
         inquirer.List(
             "action",
             message="What do you want to do with k8s?",
-            choices=["init", "join", "addons"],
+            choices=["init", "join", "addons", "wipe"],
             carousel=True,
         )
     ]
